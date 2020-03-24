@@ -2,10 +2,9 @@ package model
 
 type (
 	User struct {
-		ID int
-		// Name     string
-		Email    string
-		Address  string
-		Password string
+		ID       int    `db:"id"`
+		Email    string `db:"email"`
+		Address  string `db:"address"`
+		Password string `db:"password"`
 	}
 )

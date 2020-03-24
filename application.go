@@ -85,6 +85,7 @@ func (a *application) StartHTTPServer() {
 	a.e.POST("/login", loginController.Login)
 	a.e.POST("/register", registerController.Register)
 	a.e.GET("/account", getProfileController.GetProfile, middleware.JWT([]byte("secret")))
+	a.e.PUT("/account", getProfileController.Update, middleware.JWT([]byte("secret")))
 
 	log.Fatal(a.e.Start(":8000"))
 }

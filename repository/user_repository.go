@@ -53,7 +53,11 @@ func (ur userRepository) FindOneByEmail(email string) (model.User, error) {
 	return u, err
 }
 
-func (ur userRepository) Update(*model.User) error {
+func (ur userRepository) Update(u *model.User) error {
 
-	return nil
+	sql := "update user_account set email=$1, address=$2 where id=$3"
+
+	_, err := ur.db.Exec(sql, u.Email, u.Address, u.ID)
+
+	return err
 }

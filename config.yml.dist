@@ -1,0 +1,1 @@
+application.db.url: "user=user password=password host=localhost port=5440 dbname=lemonilo sslmode=disable"
