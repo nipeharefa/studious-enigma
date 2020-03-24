@@ -9,6 +9,5 @@ require (
 	github.com/lib/pq v1.3.0
 	github.com/sirupsen/logrus v1.5.0
 	github.com/spf13/viper v1.6.2
-	github.com/stretchr/objx v0.1.1 // indirect
 	golang.org/x/crypto v0.0.0-20200221231518-2aa609cf4a9d
 )
