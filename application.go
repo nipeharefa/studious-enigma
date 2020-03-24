@@ -8,6 +8,8 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 	_ "github.com/lib/pq"
 	"github.com/nipeharefa/lemonilo/controller"
+	"github.com/nipeharefa/lemonilo/repository"
+	"github.com/nipeharefa/lemonilo/service"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
@@ -65,8 +67,24 @@ func (a *application) connectDB() {
 
 func (a *application) StartHTTPServer() {
 
-	loginController := controller.NewLoginController()
+	a.connectDB()
+
+	// repository
+
+	userRepository := repository.NewUserRepository(a.db)
+
+	// service
+	loginService := service.NewLoginService(userRepository)
+	registerService := service.NewRegisterService(userRepository)
+	accountService := service.NewAccountService(userRepository)
+
+	getProfileController := controller.NewGetProfileController(accountService)
+	loginController := controller.NewLoginController(loginService)
+	registerController := controller.NewRegisterController(registerService)
 
 	a.e.POST("/login", loginController.Login)
+	a.e.POST("/register", registerController.Register)
+	a.e.GET("/account", getProfileController.GetProfile, middleware.JWT([]byte("secret")))
+
 	log.Fatal(a.e.Start(":8000"))
 }

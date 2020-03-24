@@ -6,13 +6,14 @@ import (
 
 	"github.com/nipeharefa/lemonilo/model"
 	"github.com/nipeharefa/lemonilo/repository"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type (
 	RegisterData interface {
 		GetEmail() string
 		GetPassword() string
-		GetName() string
+		// GetName() string
 		GetAddress() string
 	}
 
@@ -29,9 +30,9 @@ var (
 	ErrAccountExist = errors.New("account already exist")
 )
 
-func NewRegisterService() RegisterService {
+func NewRegisterService(userRepo repository.UserRepository) RegisterService {
 
-	r := registerService{}
+	r := registerService{userRepo}
 
 	return r
 }
@@ -39,10 +40,8 @@ func NewRegisterService() RegisterService {
 func (r registerService) Register(data RegisterData) error {
 
 	// Find exist email
-
 	user, err := r.userRepo.FindOneByEmail(data.GetEmail())
-
-	if err != nil || err != sql.ErrNoRows {
+	if err != nil && err != sql.ErrNoRows {
 		return err
 	}
 
@@ -50,12 +49,12 @@ func (r registerService) Register(data RegisterData) error {
 		return ErrAccountExist
 	}
 
+	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(data.GetPassword()), 10)
 	// create user
 	user = model.User{}
-	user.Name = data.GetName()
 	user.Email = data.GetEmail()
 	user.Address = data.GetAddress()
-	user.Password = data.GetPassword()
+	user.Password = string(hashedPassword)
 
 	err = r.userRepo.Create(&user)
 	if err != nil {

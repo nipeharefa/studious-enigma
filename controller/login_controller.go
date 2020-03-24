@@ -20,11 +20,15 @@ type (
 		Email    string `json:"email"`
 		Password string `json:"password"`
 	}
+
+	loginResponse struct {
+		AccessToken string `json:"accessToken"`
+	}
 )
 
-func NewLoginController() LoginController {
+func NewLoginController(loginService service.LoginService) LoginController {
 
-	lc := loginController{}
+	lc := loginController{loginService}
 	return lc
 }
 
@@ -32,16 +36,17 @@ func (lc loginController) Login(c echo.Context) error {
 
 	req := loginRequest{}
 
-	if err := c.Bind(req); err != nil {
+	if err := c.Bind(&req); err != nil {
 		return c.JSON(http.StatusBadRequest, nil)
 	}
 
-	err := lc.loginService.Login(req)
+	accessToken, err := lc.loginService.Login(req)
+
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, nil)
 	}
 
-	return c.JSON(http.StatusOK, nil)
+	return c.JSON(http.StatusOK, loginResponse{AccessToken: accessToken})
 }
 
 func (lr loginRequest) GetEmail() string {
